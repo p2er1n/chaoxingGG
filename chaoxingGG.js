@@ -188,75 +188,38 @@ function start(){
 	sleep(500);
     }
     sleep(2000);
-    
-    for(let cnt = 1;cnt <= 10;++cnt){
-	if(click("我的课程", 0))
-	    break;
-	else{
-	    if(cnt != 10){
-		toastLog("点击我的课程失败"+cnt+"次");
-		sleep(2000);
-	    }else{
-		toastLog("无法进入我的课程，脚本退出");
-		sleep(2000);
-		return;
-	    }
-	}
-    }
-    sleep(2000);
 
+    toastLog("点击我的课程");
+    let myCourseText = text("我的课程").findOne();    
+    while(!click(myCourseText.bounds().centerX(),myCourseText.bounds().centerY()))
+	sleep(1000);
+    sleep(2000);
+    
     if(text("我学的课").findOnce() != null){
-	for(let cnt = 1;cnt <= 10;++cnt){
-	    if(click("我学的课", 0))
-		break;
-	    else{
-		if(cnt != 10){
-		    toastLog("点击我学的课失败"+cnt+"次");
-		    sleep(2000);
-		}else{
-		    toastLog("无法进入我学的课，脚本退出");
-		    sleep(2000);
-		    return;
-		}
-	    }
-	}
+	toastLog("点击我学的课");
+	while(!text("我学的课").findOne().click())
+	    sleep(1000);
 	sleep(2000);
     }
 
     while(text(course).findOnce() === null){
+	if(id("help_tips").findOnce() != null){
+	    toastLog("找不到" + course + "，脚本退出");
+	    sleep(2000);
+	    return;
+	}
 	scrollDown(0);
 	sleep(2000);
     }
-    for(let cnt = 1;cnt <= 10;++cnt){
-	if(click(course, 0))
-	    break;
-	else{
-	    if(cnt != 10){
-		toastLog("点击" + course + "失败" + cnt + "次");		
-		sleep(2000);
-	    }else{
-		toastLog("无法进入" + course + "，脚本退出");
-		sleep(2000);
-		return;
-	    }	    
-	}
-    }
+    toastLog("点击"+course);
+    let courseText = text(course).findOne();
+    while(!click(courseText.bounds().centerX(), courseText.bounds().centerY()))
+	sleep(1000);
     sleep(2000);
 
-    for(let cnt = 1;cnt <= 10;++cnt){
-	if(click("章节", 0))
-	    break;
-	else{
-	    if(cnt != 10){
-		toastLog("点击章节失败"+cnt+"次");
-		sleep(2000);
-	    }else{
-		toastLog("无法进入章节，脚本退出");
-		sleep(2000);
-		return;
-	    }
-	}
-    }
+    toastLog("章节");
+    while(!text("章节").findOne().click())
+	sleep(1000);
     sleep(2000);
 
     //step into a task randomly
