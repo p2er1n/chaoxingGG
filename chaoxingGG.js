@@ -27,8 +27,19 @@ ui.layout(
 
 let version = "1.0";
 ui.title.setTitle("超星GGv" + version);
-let adUrl = "https://img1.imgtp.com/2023/09/06/KtgJCWuP.png";
-ui.ad.setSource(adUrl);
+let adUrl = null;
+let articleUrl = "https://www.cnblogs.com/Peerin/p/17682597.html";
+http.get(articleUrl,{},(res, err)=>{
+    let pattern = /【开始】(.*)【结束】/;
+    adUrl = res.body.string().match(pattern)[1];
+});
+setTimeout(function(){
+    if(adUrl != null){
+	ui.ad.setSource(adUrl);
+    }else{
+	setTimeout(arguments.callee, 500);
+    }
+}, 500);
 let helpText = `1. 首先请确保已经开启无障碍功能！
 2. 请确保已经安装了超星学习通并且已经登陆账号。
 3. 请确保超星学习通目前处于退出状态或者停留在起始页面。
@@ -221,8 +232,15 @@ function start(){
 	    }
 	}
 	if(taskIcon == null){
-	    scrollDown(0);
-	    sleep(2000);	    
+	    if(text("已经到底了").findOnce() != null){
+		toastLog("待刷课程已经被完成，脚本退出");
+		sleep(2000);
+		return;
+	    }else{
+		//scrollDown(0);
+		swipe(450,1800,450,1000,1000);
+		sleep(2000);
+	    }
 	}
     }
     for(let cnt = 1;cnt <= 10;++cnt){
@@ -313,7 +331,7 @@ function start(){
 				sleep(2000);
 				break;
 			    }
-			    sleep(5000);
+			    sleep(2000);
 			}
 			completedPlayIcons.push(playIcon);
 		    });
