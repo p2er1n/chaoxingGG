@@ -30,7 +30,7 @@ ui.title.setTitle("超星GGv" + version);
 let adUrl = null;
 let articleUrl = "https://www.cnblogs.com/Peerin/p/17682597.html";
 http.get(articleUrl,{},(res, err)=>{
-    let pattern = /【开始】(.*)【结束】/;
+    let pattern = /【广告开始】(.*)【广告结束】/;
     adUrl = res.body.string().match(pattern)[1];
 });
 setTimeout(function(){
@@ -57,6 +57,7 @@ let isMute = false;
 let isReview = false;
 let lastMute = storage.get("lastMute");
 let lastReview = storage.get("lastReview");
+let updateUrl = "https://wwya.lanzoub.com/b04wheezc";
 if(lastMute != undefined){
     isMute = lastMute;
     ui.isMute.setChecked(isMute);
@@ -84,8 +85,45 @@ ui.isReview.on("check", (checked)=>{
     storage.put("lastReview", isReview);
 });
 ui.checkUpdate.click(()=>{
-    app.openUrl("https://wwya.lanzoub.com/b04wheezc");
+    http.get(articleUrl,{},(res, err)=>{
+	let pattern = /【版本开始】(.*)【版本结束】/;
+	latestVersion = res.body.string().match(pattern)[1];
+    });    
+    setTimeout(function(){
+	if(latestVersion === null){
+	    setTimeout(arguments.callee, 1000);
+	    return;
+	}
+	if(latestVersion != version){
+	    confirm("版本更新","当前版本：" + version + "\n最新版本：" + latestVersion + "\n访问密码是：666").then((value)=>{
+		if(value){
+		    app.openUrl(updateUrl);
+		}
+	    });
+	}else{
+	    alert("当前已经是最新版本！");
+	}
+    },1000);    
 });
+
+let latestVersion = null;
+http.get(articleUrl,{},(res, err)=>{
+    let pattern = /【版本开始】(.*)【版本结束】/;
+    latestVersion = res.body.string().match(pattern)[1];
+});
+setTimeout(function(){
+    if(latestVersion === null){
+	setTimeout(arguments.callee, 1000);
+	return;
+    }
+    if(latestVersion != version){
+	confirm("版本更新","当前版本：" + version + "\n最新版本：" + latestVersion + "\n访问密码是：666").then((value)=>{
+	    if(value){
+		app.openUrl(updateUrl);
+	    }
+	});
+    }
+},1000);
 
 ui.start.click(()=>{
     course = ui.course.text();
@@ -167,22 +205,28 @@ function start(){
     }
     sleep(2000);
 
-    for(let cnt = 1;cnt <= 10;++cnt){
-	if(click("我学的课", 0))
-	    break;
-	else{
-	    if(cnt != 10){
-		toastLog("点击我学的课失败"+cnt+"次");
-		sleep(2000);
-	    }else{
-		toastLog("无法进入我学的课，脚本退出");
-		sleep(2000);
-		return;
+    if(text("我学的课").findOnce() != null){
+	for(let cnt = 1;cnt <= 10;++cnt){
+	    if(click("我学的课", 0))
+		break;
+	    else{
+		if(cnt != 10){
+		    toastLog("点击我学的课失败"+cnt+"次");
+		    sleep(2000);
+		}else{
+		    toastLog("无法进入我学的课，脚本退出");
+		    sleep(2000);
+		    return;
+		}
 	    }
 	}
+	sleep(2000);
     }
-    sleep(2000);
-    
+
+    while(text(course).findOnce() === null){
+	scrollDown(0);
+	sleep(2000);
+    }
     for(let cnt = 1;cnt <= 10;++cnt){
 	if(click(course, 0))
 	    break;
